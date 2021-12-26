@@ -1,0 +1,351 @@
+<!-- 
+Author : Sreelakshmi TV
+Refered from : Ramaguru Radhakrishnan
+Date Created : Dec - 2021
+Date Updated : 26.12.2021
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>STUDENT DETAILS</title>
+    <meta charset="UTF-8"/>
+	<style>
+	body{        
+        padding-top: 50px;
+        padding-bottom: 30px;
+    }
+	.container{
+        width: 80%;
+        margin: 0 auto; 
+    }
+	.fixed-header, .fixed-footer{
+        width: 100%;
+        position: fixed;        
+        background: #C8A2C8;
+        padding: 10px 0;
+        color:#160075;
+    }
+	.fixed-header{
+        top: 0;
+    }
+    .fixed-footer{
+        bottom: 0;
+    } 
+	.container p{
+		padding-top: 90px;
+        line-height: 20px;
+    }
+	
+	</style>
+</head>
+<body>
+	<div class="fixed-header">
+		<div class="container">
+		<center>
+			<h2> STUDENT-TEACHER DAPP </h2>
+		</center>
+		</div>
+	</div>
+        
+	<div class="container">	
+	<p>
+		<b><u> STUDENT DETAILS </u></b><br/><br/>
+		<form>
+			<table>
+			 <tr><td> Name : </td> <td> <input type="text" id="name" name="name"> </td></tr>
+			 <tr><td> Roll number : </td> <td> <input type="text" id="rollno" name="rollno"> </td></tr>
+			 <tr><td> Department : </td> <td> <input type="text" id="dept" name="dept"> </td></tr>
+			 <tr><td> Series 1 Mark : </td> <td> <input type="number" id="mark1" name="mark1"> </td></tr>
+			 <tr><td> Series 2 Mark : </td> <td> <input type="number" id="mark2" name="mark2"> </td></tr>
+			 <tr><td> Final Exam Marks : </td> <td> <input type="number" id="mark3" name="mark3"> </td></tr>
+			 <!--<tr><td> Blood Group : </td> <td> <input type="number" id="bgrp" name="bgrp"> </td></tr> -->
+			 <tr><td><input type="button" onclick="storestudent()" value="Submit"></td></tr>
+
+			</table>
+			
+			<h4> Transaction ID: <a href="https://ropsten.etherscan.io/"><div id="result"></div></a> </h4>
+			
+		</form>
+		<br/>
+		<hr>
+		<form>
+			<table>
+			 <tr><td> Roll number : </td> <td> <input type="text" id="rollno" name="rollno"> </td></tr>
+			 <tr><td><input type="button" onclick="retrievestudent()" value="Get Student Details"></td></tr>
+			 <h4> Name : <div id="name_retrieve"></div></h4> 
+			 <h4> Total marks : <div id="totalmark"></div></h4> 
+			 <h4> SGPA : <div id="SGPA"></div></h4> 
+
+			</table>
+		
+		</form>
+		<hr>
+		<input type="button" onclick="location.href='teacher.html'" value="Class Advisor Details">
+		<br/>
+	</p>	
+	</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha3/0.8.0/sha3.js"></script>
+    <script>	
+	
+	var account;
+	window.addEventListener('load', async () => {
+
+	
+		if (typeof window.ethereum !== 'undefined') { 
+			console.log("MetaMask is Available :) !"); 
+			}
+			
+		// Modern DApp browsers
+		if (window.ethereum) {
+			window.web3 = new Web3(ethereum);
+			
+			// To prevent the page reloading when the MetaMask network changes
+			ethereum.autoRefreshOnNetworkChange = false;
+			
+			// To Capture the account details from MetaMask
+			const accounts = await ethereum.enable();
+			account = accounts[0];
+			
+			}
+			// Legacy DApp browsers
+			else if (window.web3) {
+				//window.web3 = new Web3(web3.currentProvider);
+				window.web3 = new Web3(new Web3.providers.HttpProvider("https://ropsten.infura.io/v3/cbd9dc11b30147e9a2cc974be655ef7c")); 
+				}
+			// Non-DApp browsers
+			else {
+				console.log('Non-Ethereum browser detected. Please install MetaMask');
+				}
+			
+			});
+			
+			// Smart Contract ABI - Application Binary Interfaces
+			var abi = [
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"name": "emittingDetails",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_rollno",
+				"type": "string"
+			}
+		],
+		"name": "retrievestudent",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_tid",
+				"type": "string"
+			}
+		],
+		"name": "retrieveteacher",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_rollno",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_branch",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_mark1",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_mark2",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_mark3",
+				"type": "uint256"
+			}
+		],
+		"name": "storestudent",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_tid",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_tname",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_department",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_coursehandled",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_no_class",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_no_students",
+				"type": "uint256"
+			}
+		],
+		"name": "storeteacher",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+]	//Smart Contract Address
+			var contractaddress = '0xfac1c8efd1cbef63df64c8bbe7aa383e7c88548d';
+
+			// Function to call the "Anonymize Day" in Deployed Smart Contract
+			function storestudent(){
+					
+				console.log("");
+						
+				//Instantiate and connect to contract address via ABI
+				var myContract = new web3.eth.Contract(abi,contractaddress, {from: account, gasPrice: '5000000', gas: '5000000'});
+
+					//get the values from the HTML to JS using getElementById
+				name = document.getElementById("name").value;
+				rollno = document.getElementById("rollno").value;
+				dept = document.getElementById("dept").value;
+				mark1 = document.getElementById("mark1").value;
+				mark2 = document.getElementById("mark2").value;
+				mark3 = document.getElementById("mark3").value;
+
+	
+				//call the "storeStudent" function
+				var result = myContract.methods.storestudent(rollno, name, dept, mark1, mark2, mark3).send(function (err, result) {
+				
+				if (err) { console.log(err); }
+				if (result) { document.getElementById("result").innerHTML = result; }
+				
+				});
+			}
+			
+			// Function to call the "retrieveStudent" in Deployed Smart Contract
+			function retrievestudent() {
+					
+				console.log("Inside retrieve fntn");
+						
+				//Instantiate and connect to contract address via ABI
+				var myContract = new web3.eth.Contract(abi,contractaddress, {from: account, gasPrice: '12040852735', gas: '5000000'});
+								
+			
+				
+				//call the "retrieve" function
+				var result = myContract.methods.retrievestudent(rollno).call(function (err, result) {
+				
+				
+				if (err) { console.log(err); }
+				
+				 if (result) { document.getElementById("name_retrieve").innerHTML = result[0];
+				  }
+				 if (result) {
+				 	document.getElementById("totalmark").innerHTML = result[1];
+				 }
+				 if (result) { document.getElementById("SGPA").innerHTML = result[2];
+				 }
+
+				
+				});
+				
+			}
+						
+    </script>
+	
+	<div class="fixed-footer">
+		<div class="container">
+			<center> <h5> Copyright &copy; 2021-2022 <br/> Sreelakshmi TV, Amrita Vishwa Vidyapeetham, Coimbatore, Tamil Nadu, India </h5> </center>
+		</div>
+	</div>
+
+</body>
